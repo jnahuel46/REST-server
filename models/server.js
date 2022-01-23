@@ -2,6 +2,7 @@
 
 const express = require('express');//aca creamos un webserver, para servir contenido estatico
 const cors = require('cors');
+const { dbConecction } = require('../database/config-db');
 
 
 
@@ -12,9 +13,12 @@ class Server {
         this.app = express();//Configuro puerto
         this.port = process.env.PORT;
         this.usuariosRoutePath = '/api/usuarios';
+        
+
+        // Conectar a DB
+        this.conectarDb();
 
         //Middlewares
-        
         this.middlewares();//Configuro archivos staticos que van a ser servidos
         
         //Routes
@@ -22,7 +26,11 @@ class Server {
     
     }
 
-    middlewares() {
+    async conectarDb() {
+        await dbConecction();
+    }
+
+    middlewares() { //funcion que se ejecuta antes de llamar al controlador so seguir con la ejecucino de las peticiones
         //Cors
         this.app.use(cors());
 
