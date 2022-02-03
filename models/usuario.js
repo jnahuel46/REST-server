@@ -33,7 +33,8 @@ const UsuarioSchema = Schema ({
 });
 
 UsuarioSchema.methods.toJSON = function() {
-    const { __v, password, ...usuario } = this.toObject();
+    const { __v, password, _id, ...usuario } = this.toObject();// extraigo todo lo que esta antes de los puntos para no mostarlo
+    usuario.uid = _id;// cambio _id por uid
     return usuario;
 }
 

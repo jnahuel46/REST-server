@@ -1,5 +1,5 @@
 const { response, request } = require('express');
-const Usuario = require('../usuario');
+const Usuario = require('../models/usuario');
 const bcryptjs = require('bcryptjs');
 
 
@@ -12,7 +12,7 @@ const usuariosGet = async (req = request, res = response) => {
 
     const { limite = 5, desde = 0 } = req.query;//Para ponerle limite de getters
     const queryEstado = { estado: true };//Solo retorno lo que tenga estado true
-    
+
     /*const usuarios = await Usuario.find(queryEstado)
         .skip(Number(desde))
         .limit(Number(limite));
@@ -73,18 +73,22 @@ const usuariosPost = async (req, res = response) => {
     });
 }
 
-const usuariosDelete = async(req, res = response) => {
+const usuariosDelete = async (req, res = response) => {
 
     const id = req.params.id;
-    
+    const uid = req.uid;
+    const usuarioAuth = req.usuario;  // el uid viene del validar token
+
     //Borrado Fisico--No aconsejado porque se puede perder la integridad de las referencias
     //const usuario = await Usuario.findByIdAndDelete( id );
 
-    const usuario = await Usuario.findByIdAndUpdate( id, {estado: false} );
+    const usuario = await Usuario.findByIdAndUpdate(id, { estado: false });
 
 
     res.json({
-      usuario
+        usuario,
+        uid,
+        usuarioAuth
     });
 }
 
