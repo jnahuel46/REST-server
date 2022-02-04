@@ -7,9 +7,9 @@ const Usuario = require("../models/usuario");
 
 const cargarArchivo = async (req, res) => {
 
-  try {
+    try {
         //Imagenes
-        const nombre = await subirArchivo(req.files, undefined , 'imagenes');
+        const nombre = await subirArchivo(req.files, undefined, 'imagenes');
         res.json({ nombre });//El resultado de subirArchivo lo almaceno en nombre y lo imprimo
     } catch (error) {
         res.status(400).json({ msg });
@@ -49,11 +49,11 @@ const actualizarImg = async (req, res) => {
 
 
     // Limpiar imágenes previas
-    if ( modelo.img ) {
+    if (modelo.img) {
         // Hay que borrar la imagen del servidor
-        const pathImagen = path.join( __dirname, '../uploads', coleccion, modelo.img );
-        if ( fs.existsSync( pathImagen ) ) {
-            fs.unlinkSync( pathImagen );
+        const pathImagen = path.join(__dirname, '../uploads', coleccion, modelo.img);
+        if (fs.existsSync(pathImagen)) {
+            fs.unlinkSync(pathImagen);
         }
     }
     const nombre = await subirArchivo(req.files, undefined, coleccion);
@@ -66,7 +66,52 @@ const actualizarImg = async (req, res) => {
     });
 }
 
+
+const mostrarImagenes = async (req, res) => {
+
+    const { id, coleccion } = req.params;
+
+    let modelo;
+
+    switch (coleccion) {
+        case 'usuarios':
+            modelo = await Usuario.findById(id);
+            if (!modelo) {
+                return res.status(400).json({
+                    msg: `No existe un usuario con el id ${id}`
+                });
+            }
+            break;
+
+        case 'productos':
+            modelo = await Producto.findById(id);
+            if (!modelo) {
+                return res.status(400).json({
+                    msg: `No existe un producto con el id ${id}`
+                });
+            }
+            break;
+
+        default:
+            return res.status(500).json({ msg: 'Error' });
+    }
+
+
+    // Limpiar imágenes previas
+    if (modelo.img) {
+        // Hay que borrar la imagen del servidor
+        const pathImagen = path.join(__dirname, '../uploads', coleccion, modelo.img);
+        if (fs.existsSync(pathImagen)) {
+            return res.sendFile(pathImagen)
+        }
+    }
+
+    const pathImagen = path.join(__dirname, '../assets/no-image.jpg');
+    res.sendFile(pathImagen);
+};
+
 module.exports = {
     cargarArchivo,
-    actualizarImg
+    actualizarImg,
+    mostrarImagenes
 }
